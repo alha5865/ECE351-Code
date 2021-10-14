@@ -1,0 +1,91 @@
+from scipy import signal as sps
+import numpy as np
+from numpy import sin,cos
+import matplotlib.pyplot as plt
+
+def time_sig_gen(start,end,no_of_points) :
+    time = np.linspace(start,end,no_of_points)
+    signal = np.zeros(time.shape)
+    return time,signal
+def stepfunc(t,signal,time, stepsize):
+    
+    for k,i in enumerate(t) :
+        if i > time :
+            signal[k] = signal[k] + stepsize
+            
+    return signal    
+def f3(time,signal) :
+    stepfunc (time,signal,0,1/2)
+    f = np.exp(-4*time)
+    f2 = 1/2*f
+    f3 = np.exp(-6*time)
+    signal = f3-f2+signal    
+    return signal
+
+
+################ step response of f1
+time,signal = time_sig_gen(0,2000e-3,100)
+signal_ = signal.copy()
+
+s = f3(time,signal)
+lti = sps.lti([1,6,12], [1.0, 10,24])
+t, y = sps.step(lti)
+#plt.plot(t, y)
+# plotting step by hand
+plt.plot(time,s)
+plt.grid()
+plt.xlim([0,2])
+plt.xlabel("time --->")
+plt.ylabel("Magnitude --->")
+plt.title("Step response found by hand")
+plt.show()
+## ploting step by step()
+plt.xlabel("time --->")
+plt.grid()
+plt.ylabel("Magnitude --->")
+plt.plot(t,y)
+plt.title("Step response found by step function")
+plt.xlim([0,2])
+plt.show()
+
+
+den = [1,6.0,12.0]
+num = [1.0, 10.0,24.0,0]
+r,p,k = sps.residue(den,num)
+a_list = [r[0],p[0],r[1],p[1],r[2],p[2]]
+an = [round(num, 1) for num in a_list]
+print("====== Part 1(Task 3) ======\n\n")
+print("R = {} \nP = {} \nK = {} \nResides are {} /(s+ {} )+ {} /(s+ {} )+ {} /(s+ {} )".format(r,p,k,an[0],-an[1],an[2],-an[3],an[4],-an[5]))
+
+
+##s^5+18s^4+218s^3+2036s^2+9085s+25250 = 25250
+print("\n====== Part 2(Task 1) ======\n\n")
+den = 25250
+num = [1,18,218,2036,9085,25250,0]
+r,p,k = sps.residue(den,num)
+print("R = {} \nP = {} \nK = {} \n)".format(r,p,k))
+
+# plot step response calculated by hand
+t = np.linspace(0,4.5,100)
+s = 1.0 - sin(t*10.0j)*0.21461962999998718260030727833509j + cos(t*(10.0 - 1.0j))*(0.092886739999997303129930514842272 + 0.04765193000000067513610702008009j) + cos(t*(10.0 + 1.0j))*(0.092886739999997303129930514842272 - 0.04765193000000067513610702008009j) + sin(t*(10.0 - 1.0j))*(0.04765193000000067513610702008009 - 0.092886739999997303129930514842272j) + sin(t*(10.0 + 1.0j))*(0.04765193000000067513610702008009 + 0.092886739999997303129930514842272j) - cos(t*(4.0 - 3.0j))*(0.48557692000002816712367348372936 + 0.72836538000001382897607982158661j) - cos(t*(4.0 + 3.0j))*(0.48557692000002816712367348372936 - 0.72836538000001382897607982158661j) - sin(t*(4.0 - 3.0j))*(0.72836538000001382897607982158661 - 0.48557692000002816712367348372936j) - sin(t*(4.0 + 3.0j))*(0.72836538000001382897607982158661 + 0.48557692000002816712367348372936j) - 0.21461962999998718260030727833509*cos(t*10.0j)
+s[73:100] = s[83]
+plt.plot(t,s) 
+plt.xlim([0,4.5])
+plt.grid()
+plt.xlabel("time --->")
+plt.ylabel("Magnitude --->")
+plt.title("Step response found by using cosne method")
+plt.show()
+
+# plot step response of part2
+den = 25250
+num = [1,18,218,2036,9085,25250]
+lti = sps.lti(den,num)
+t, y = sps.step(lti)
+plt.plot(t, y)
+plt.xlabel("time --->")
+plt.ylabel("Magnitude --->")
+plt.grid()
+plt.xlim([0,4.5])
+plt.title("Step response found by using step() function")
+plt.show()
