@@ -1,0 +1,80 @@
+from scipy import signal
+from matplotlib import pyplot as plt
+import numpy as np
+
+w = np.linspace(1000,10000000,1000000)
+
+num = [ 10000, 0]
+den = [1, 10000, 3.704e08]
+w = np.linspace(1000,1000000,10000)
+sys = signal.TransferFunction(num, den)
+w, mag, phase = signal.bode(sys,w)
+
+
+
+plt.figure()
+plt.title("Bode magnitude(using library) -->")
+plt.xlabel("Frequency -->")
+plt.ylabel("Magnitude -->")
+plt.semilogx(w, mag)  # Bode magnitude plot
+plt.figure()
+plt.title("Bode phase(using library) -->")
+plt.xlabel("Frequency -->")
+plt.ylabel("angle -->")   # Bode
+plt.semilogx(w, phase)  # Bode phase plot
+plt.show()
+
+w = np.linspace(500,1000000,10000)
+sys = signal.TransferFunction(num, den)
+w, mag, phase = signal.bode(sys,w)
+
+c = 100*10**-9
+l = 27*10**-3
+r = 1*10**3
+w1 = np.linspace(1000,10000000,100000)
+Mag1 = (w/(r*c))/(np.sqrt(((1/(l*c))-w**2)**2+(w/(r*c))**2))
+
+angle1 =  180/np.pi*np.arctan((w/(r*c)/(1/(l*c)-w**2)))
+plt.title("Bode magnitude(By Hand) -->")
+plt.xlabel("Frequency -->")
+plt.ylabel("Magnitude -->")
+plt.semilogx(w, mag) 
+plt.grid()
+plt.show()
+
+plt.figure()
+plt.title("Bode phase(By Hand) -->")
+plt.xlabel("Frequency -->")
+plt.ylabel("angle -->")   # Bode
+plt.semilogx(w, phase)
+plt.grid()
+plt.show()
+plt.figure()
+import control as con 
+sys = con . TransferFunction (num , den )
+con. bode (sys , w , dB = True , Hz = True , deg = True , Plot = True )
+plt.title("bodeplot using control package")
+plt.show()
+
+t = np.linspace(0,0.01,500)
+p_t = np.pi*2
+x = np.cos(p_t*100*t) + np.cos(p_t*3024*t) + np.sin(p_t*50000*t)
+plt.figure()
+plt.title("Signal")
+plt.xlabel("Frequency -->")
+plt.ylabel("Magnitude -->")
+plt.plot(t, x) 
+plt.show()
+
+plt.figure()
+fs = 50000
+num = [ 10000, 0]
+den = [1, 10000, 3.704e08]
+filtz = signal.lti(*signal.bilinear(num, den,fs))
+zi = signal.lfilter_zi(filtz.num, filtz.den)
+z, _ = signal.lfilter(filtz.num, filtz.den, x, zi=zi*x[0])
+plt.title("Output Signal")
+plt.xlabel("Frequency -->")
+plt.ylabel("Magnitude -->")
+plt.plot(t, z) 
+plt.show()
